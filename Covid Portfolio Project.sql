@@ -1,11 +1,12 @@
--- Selecting the data we are going to be using 
+-- Selecting the data we are going to use for the Covids data exploration
 
 Select location, date,total_cases,new_cases,total_deaths,population
 From Portfoliodatabase..CovidDeaths
 Order by 1,2
 
 -- We are looking at Total Cases vs Total Deaths
--- It shows the likelihood of dying if you contract covid in your country
+-- It shows the likelihood of dying if you contract covid in your country (in this case I have used United States )
+-- It is visible, in the United States although the first case was reported on 22nd January 2020, the first date reported was more than a month later (29th February)
 Select location, date,total_cases,total_deaths,(total_deaths/total_cases)*100 as DeathPercentage
 From Portfoliodatabase..CovidDeaths
 WHERE location like '%states%'
@@ -19,30 +20,39 @@ From Portfoliodatabase..CovidDeaths
 WHERE location like '%states%'
 Order by 1,2
 
--- We want to look at which country has the highest infection rate compared to population
-Select location,population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercPopoulationInfected
+-- We want to look at which country has the highest infection rate compared to population Task 3
+Select Location,population, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercPopoulationInfected
 From Portfoliodatabase..CovidDeaths
 --WHERE location like '%states%'
 GROUP BY location,population
 Order by 4 DESC
 
+
+-- Task 4
+Select Location,population,date, MAX(total_cases) as HighestInfectionCount, MAX((total_cases/population))*100 as PercPopoulationInfected
+From Portfoliodatabase..CovidDeaths
+--WHERE location like '%states%'
+GROUP BY location,population,date
+Order by PercPopoulationInfected DESC
+
 -- We will see the countries with the highest death count per population
 
 
 
-Select location,MAX(cast(Total_deaths as int)) as TotalDeath
+Select location,MAX(cast(Total_deaths as int)) as TotalDeaths
 From Portfoliodatabase..CovidDeaths
 -- Resolving the Location issue 
 WHERE continent is not null    
 GROUP BY location
 Order by 2 DESC
 
--- Breaking things down by continent 
+-- Breaking things down by continent Task 2
 
-Select location,MAX(cast(Total_deaths as int)) as TotalDeath
+Select location,SUM(cast(new_deaths as int)) as TotalDeaths
 From Portfoliodatabase..CovidDeaths
 -- Resolving the Location issue 
 WHERE continent is null and location not LIKE '%income'
+and location not in ('World','European Union','International')
 GROUP BY location	
 Order by 2 DESC  
 --above I need to take care of the income segregation (can be used in Tableau)
